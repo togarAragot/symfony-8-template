@@ -1,0 +1,15 @@
+https://www.localhost {
+    redir https://localhost{uri} permanent
+}
+
+https://localhost {
+    root * /var/www/app/public
+
+    encode gzip zstd
+
+    file_server {
+        hide .*
+    }
+
+    php_fastcgi php:9000
+}

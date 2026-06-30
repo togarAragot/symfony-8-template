@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      target: prod
+    volumes:
+      - ./docker/php/php.prod.ini:/usr/local/etc/php/php.ini:ro
+    networks:
+      - internal
+
+  queue:
+    build:
+      target: prod
+    networks:
+      - internal
+
+  node:
+    command: sh -c "npm install && npm run build"
+    restart: no
+    networks:
+      - public
+
+  database:
+    networks:
+      - internal
+
+  redis:
+    networks:
+      - internal
+
+  caddy:
+    volumes:
+      - ./docker/caddy/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+    networks:
+      - internal
+      - public
+
+networks:
+  internal:
+    internal: true
+  public:

@@ -1,0 +1,13 @@
+{
+    local_certs
+}
+
+https://localhost {
+    root * /var/www/app/public
+
+    encode gzip zstd
+
+    php_fastcgi app:9000
+
+    file_server
+}

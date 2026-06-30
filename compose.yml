@@ -1,0 +1,63 @@
+services:
+  app: &app
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/app
+    volumes:
+      - ./app:/var/www/app
+      - ./docker/php/php.dev.ini:/usr/local/etc/php/php.ini:ro
+    depends_on:
+      - database
+
+  queue:
+    <<: *app
+    command: supervisord -c /etc/supervisor/conf.d/workers.conf
+    depends_on:
+      - app
+    volumes:
+      - ./app:/var/www/app
+      - ./docker/php/php.dev.ini:/usr/local/etc/php/php.ini:ro
+      - ./docker/php/supervisord.conf:/etc/supervisor/conf.d/workers.conf:ro
+
+  node:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /var/www/app
+    command: sh -c "npm install && npm run watch"
+    volumes:
+      - ./app:/var/www/app
+    depends_on:
+      - app
+
+  database:
+    image: percona/percona-server:8.4
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  caddy:
+    image: caddy:2.11.4
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app:/var/www/app:ro
+      - ./docker/caddy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+  redis:
+    image: redis:8.8.0-alpine
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  caddy_data:
