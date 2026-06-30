@@ -23,11 +23,10 @@ A base project template for Symfony 8, using Docker Compose for local developmen
 
 ## Local Development
 
-1. Create your environment files:
+1. Create your environment files (needed for prod):
 
    ```bash
-   cp .env.example .env
-   cp app/.env.example app/.env
+   cp .env.dist .env
    ```
 
    Adjust the values in both `.env` (used by Docker Compose, e.g. database credentials) and `app/.env` (used by Symfony) as needed for your local setup.
