@@ -1,5 +1,6 @@
 services:
   app: &app
+    user: "${UID}:${GID}"
     build:
       context: .
       dockerfile: docker/php/Dockerfile
